@@ -1,0 +1,25 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+	new file:   PlagiarismChecker.sln
+	new file:   PlagiarismChecker/AnsData.cs
+	new file:   PlagiarismChecker/CLexer.cs
+	new file:   PlagiarismChecker/Consts.cs
+	new file:   PlagiarismChecker/FileOpr.cs
+	new file:   PlagiarismChecker/Form1.Designer.cs
+	new file:   PlagiarismChecker/Form1.cs
+	new file:   PlagiarismChecker/Form1.resx
+	new file:   PlagiarismChecker/PlagiarismChecker.csproj
+	new file:   PlagiarismChecker/Program.cs
+	new file:   PlagiarismChecker/Properties/AssemblyInfo.cs
+	new file:   PlagiarismChecker/Properties/Resources.Designer.cs
+	new file:   PlagiarismChecker/Properties/Resources.resx
+	new file:   PlagiarismChecker/Properties/Settings.Designer.cs
+	new file:   PlagiarismChecker/Properties/Settings.settings
+	new file:   PlagiarismChecker/StringFunctions.cs
+#
+
