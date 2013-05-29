@@ -17,6 +17,18 @@ namespace PlagiarismChecker
     public static class StringFunctions
     {
         /// <summary>
+        /// 读文件，返回一个字符串
+        /// </summary>
+        /// <param name="filename">带路径的文件名</param>
+        /// <returns></returns>
+        public static string readFile(string filename)
+        {
+            StreamReader sr = new StreamReader(filename, System.Text.Encoding.Default);
+            string resuilt = sr.ReadToEnd();
+            sr.Close();
+            return resuilt;
+        }
+        /// <summary>
         /// 将形如[][][]的文件名切割成字符串数组
         /// </summary>
         /// <param name="input">输入的完整文件名</param>
@@ -275,8 +287,9 @@ namespace PlagiarismChecker
         }
         public static double calSim(string a, string b)
         {
-            if (a.Length < 1000 && b.Length < 1000) return Math.Max(calstringsim(a, b), calstringsim3(a, b));
-            else return calstringsim3(a, b);
+            //if (a.Length < 1000 && b.Length < 1000) return Math.Max(calstringsim(a, b), calstringsim3(a, b));
+            //else return calstringsim3(a, b);
+            return calstringsim3(a, b);
         }
         public static string doubleToString(double x)
         {

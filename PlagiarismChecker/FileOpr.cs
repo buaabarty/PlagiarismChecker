@@ -87,6 +87,28 @@ namespace PlagiarismChecker
             }
             return ans;
         }
+        public static int deleteAllExtentionFiles(string folder, string[] ext)
+        {
+            int totDelete = 0;
+            string[] files = Directory.GetFiles(folder);
+            foreach (string file in files)
+            {
+                FileInfo tmp = new FileInfo(file);
+                bool find = false;
+                for (int i = 0; i < ext.Length; ++i)
+                    if (tmp.Extension == ext[i])
+                    {
+                        find = true;
+                        break;
+                    }
+                if (find)
+                {
+                    File.Delete(file);
+                    ++totDelete;
+                }
+            }
+            return totDelete;
+        }
     }
     #endregion
 }
