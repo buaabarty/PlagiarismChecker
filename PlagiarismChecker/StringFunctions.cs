@@ -6,28 +6,13 @@ using System.IO;
 
 namespace PlagiarismChecker
 {
-    
-
-    
-    
     #region StringFunction
     /// <summary>
     /// 字符串处理类
     /// </summary>
     public static class StringFunctions
     {
-        /// <summary>
-        /// 读文件，返回一个字符串
-        /// </summary>
-        /// <param name="filename">带路径的文件名</param>
-        /// <returns></returns>
-        public static string readFile(string filename)
-        {
-            StreamReader sr = new StreamReader(filename, System.Text.Encoding.Default);
-            string resuilt = sr.ReadToEnd();
-            sr.Close();
-            return resuilt;
-        }
+        
         /// <summary>
         /// 将形如[][][]的文件名切割成字符串数组
         /// </summary>
@@ -246,14 +231,15 @@ namespace PlagiarismChecker
             return result;
         }
         /// <summary>
-        /// .c文件名转化为.o
+        /// .*文件名转化为.o
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
         public static string fileCToO(string filename)
         {
-            string ans = filename.Substring(0, filename.Length - 1) + "o";
-            return ans;
+            int loc = filename.IndexOf(".");
+            if (loc == -1) return filename + ".o";
+            return filename.Substring(0, loc) + ".o";
         }
         /// <summary>
         /// .*转化为.a
@@ -262,39 +248,73 @@ namespace PlagiarismChecker
         /// <returns></returns>
         public static string fileCToASM(string filename)
         {
-            string ans = filename.Substring(0, filename.Length - 1) + "a";
-            return ans;
+            int loc = filename.IndexOf(".");
+            if (loc == -1) return filename + ".a";
+            return filename.Substring(0, loc) + ".a";
         }
         /// <summary>
-        /// .c转化为.i save init code
+        /// .*转化为.i save init code
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
         public static string fileCToI(string filename)
         {
-            string ans = filename.Substring(0, filename.Length - 1) + "i";
-            return ans;
+            int loc = filename.IndexOf(".");
+            if (loc == -1) return filename + ".i";
+            return filename.Substring(0, loc) + ".i";
         }
         /// <summary>
-        /// .c转化为.l save lexer result
+        /// .*转化为.l save lexer result
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
         public static string fileCToLex(string filename)
         {
-            string ans = filename.Substring(0, filename.Length - 1) + "l";
-            return ans;
+            int loc = filename.IndexOf(".");
+            if (loc == -1) return filename + ".l";
+            return filename.Substring(0, loc) + ".l";
         }
+        /// <summary>
+        /// 计算两个文本的相似度接口，当前为调用sim3函数
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static double calSim(string a, string b)
         {
             //if (a.Length < 1000 && b.Length < 1000) return Math.Max(calstringsim(a, b), calstringsim3(a, b));
             //else return calstringsim3(a, b);
             return calstringsim3(a, b);
         }
+        /// <summary>
+        /// 自定义doubletostring函数
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static string doubleToString(double x)
         {
             string ans = String.Format("{0:0%}", x);
             return ans;
+        }
+        /// <summary>
+        /// 获取文件名中的扩展名
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static string extention(string filename)
+        {
+            int loc = filename.IndexOf(".");
+            if (loc == -1) return "";
+            return filename.Substring(loc + 1, filename.Length - loc - 1);
+        }
+        /// <summary>
+        /// 判断文件是否为cpp
+        /// </summary>
+        /// <param name="ext"></param>
+        /// <returns></returns>
+        public static bool isCpp(string ext)
+        {
+            return (ext == "cc" || ext == "cpp" || ext == "cxx" || ext == "c++");
         }
     }
     #endregion

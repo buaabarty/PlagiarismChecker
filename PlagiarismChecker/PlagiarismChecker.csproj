@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnsData.cs" />
+    <Compile Include="BuaaData.cs" />
     <Compile Include="CLexer.cs" />
     <Compile Include="Cluster.cs" />
     <Compile Include="ClusterResult.cs">
@@ -58,6 +59,7 @@
     <Compile Include="ClusterResult.Designer.cs">
       <DependentUpon>ClusterResult.cs</DependentUpon>
     </Compile>
+    <Compile Include="Compiler.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="FileOpr.cs" />
     <Compile Include="Form1.cs">

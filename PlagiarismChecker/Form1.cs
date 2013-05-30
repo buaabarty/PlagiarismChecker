@@ -27,12 +27,14 @@ namespace PlagiarismChecker
         MarkerStyle SameWordsStyle = new MarkerStyle(new SolidBrush(Color.FromArgb(40, Color.Gray)));
         #endregion
 
-        CLexer cl = new CLexer();
-        double[] codeSimilarity = new double[Consts.MAXFILES];
-        double[] initSimilarity = new double[Consts.MAXFILES];
-        double[] lexSimilarity = new double[Consts.MAXFILES];
-        double[] asmSimilarity = new double[Consts.MAXFILES];
-        string leftFileName;
+        private CLexer cl = new CLexer();
+        private double[] codeSimilarity = new double[Consts.MAXFILES];
+        private double[] initSimilarity = new double[Consts.MAXFILES];
+        private double[] lexSimilarity = new double[Consts.MAXFILES];
+        private double[] asmSimilarity = new double[Consts.MAXFILES];
+        private string leftFileName;
+        private double threshold;
+
 
         /// <summary>
         /// 
@@ -42,6 +44,7 @@ namespace PlagiarismChecker
             InitializeComponent();
             InitStylesPriority();
             toolStripStatusLabel1.Text = "请选择目录~";
+            threshold = Consts.SIMTHRESHOLD_MID;
         }
         #region UI_Compoment
         /// <summary>
@@ -274,21 +277,121 @@ namespace PlagiarismChecker
             CSyntaxHighlight(rightText, e);
         }
         #endregion
+        #region Similarity_Calculate
         /// <summary>
-        /// 
+        /// 带阈值的相似度计算
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button2_Click(object sender, EventArgs e)
+        private void calAllSim()
         {
-            rightText.Text = StringFunctions.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(leftFileName)));
+            string[] tx = new string[listBox2.Items.Count];
+            int cnt = 0;
+            if (leftText.Text == "")
+            {
+                MessageBox.Show("请从左侧选择一份待测代码！");
+                return;
+            }
+            if (listBox2.Items.Count == 0)
+            {
+                MessageBox.Show("请先选择一个非空文件夹！");
+                return;
+            }
+            string lcode = FileOpr.readFile(StringFunctions.foldToFileName(leftFileName));
+            string linit = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(leftFileName)));
+            string lasm = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(leftFileName)));
+            string llex = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(leftFileName)));
+            toolStripProgressBar1.Value = 0;
+            for (int i = 0; i < listBox2.Items.Count; ++i)
+            {
+                string code = FileOpr.readFile(StringFunctions.foldToFileName(listBox2.Items[i] as string));
+                string initcode = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
+                string lexcode = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
+                string asm = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
+                ++cnt;
+                toolStripStatusLabel1.Text = String.Format("正在计算{0}与第{1}个文件的相似度，共{2}个文件", leftFileName, i + 1, listBox2.Items.Count);
+                statusStrip1.Refresh();
+                codeSimilarity[i] = StringFunctions.calSim(lcode, code);
+                initSimilarity[i] = StringFunctions.calSim(linit, initcode);
+                lexSimilarity[i] = StringFunctions.calSim(llex, lexcode);
+                asmSimilarity[i] = StringFunctions.calSim(lasm, asm);
+                if (codeSimilarity[i] > threshold || initSimilarity[i] > threshold || lexSimilarity[i] > threshold || asmSimilarity[i] > threshold)
+                //if (true)
+                {
+                    tx[cnt - 1] = listBox2.Items[i].ToString();
+                    codeSimilarity[cnt - 1] = codeSimilarity[i];
+                    initSimilarity[cnt - 1] = initSimilarity[i];
+                    lexSimilarity[cnt - 1] = lexSimilarity[i];
+                    asmSimilarity[cnt - 1] = asmSimilarity[i];
+                }
+                else --cnt;
+                toolStripProgressBar1.Value = (int)((i + 1) * 1000 / listBox2.Items.Count);
+                statusStrip1.Refresh();
+            }
+            toolStripStatusLabel1.Text = String.Format("相似度计算完毕，共{0}个代码，其中相似代码{1}个", listBox2.Items.Count, cnt);
+            listBox1.Items.Clear();
+            for (int i = 0; i < cnt; ++i)
+                listBox1.Items.Add(tx[i]);
         }
-        
+
+        /// <summary>
+        /// 不带阈值的相似度计算
+        /// </summary>
+        private void calAllSim2()
+        {
+            string[] tx = new string[listBox2.Items.Count];
+            int cnt = 0;
+            if (leftText.Text == "")
+            {
+                MessageBox.Show("请从左侧选择一份待测代码！");
+                return;
+            }
+            if (listBox2.Items.Count == 0)
+            {
+                MessageBox.Show("请先选择一个非空文件夹！");
+                return;
+            }
+            string lcode = FileOpr.readFile(StringFunctions.foldToFileName(leftFileName));
+            string linit = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(leftFileName)));
+            string lasm = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(leftFileName)));
+            string llex = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(leftFileName)));
+            toolStripProgressBar1.Value = 0;
+            for (int i = 0; i < listBox2.Items.Count; ++i)
+            {
+                string code = FileOpr.readFile(StringFunctions.foldToFileName(listBox2.Items[i] as string));
+                string initcode = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
+                string lexcode = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
+                string asm = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
+                ++cnt;
+                toolStripStatusLabel1.Text = String.Format("正在计算{0}与第{1}个文件的相似度，共{2}个文件", leftFileName, i + 1, listBox2.Items.Count);
+                statusStrip1.Refresh();
+                codeSimilarity[i] = StringFunctions.calSim(lcode, code);
+                initSimilarity[i] = StringFunctions.calSim(linit, initcode);
+                lexSimilarity[i] = StringFunctions.calSim(llex, lexcode);
+                asmSimilarity[i] = StringFunctions.calSim(lasm, asm);
+                //if (codeSimilarity[i] > 0.75 || initSimilarity[i] > 0.75 || lexSimilarity[i] > 0.8 || asmSimilarity[i] > 0.70)
+                if (true)
+                {
+                    tx[cnt - 1] = listBox2.Items[i].ToString();
+                    codeSimilarity[cnt - 1] = codeSimilarity[i];
+                    initSimilarity[cnt - 1] = initSimilarity[i];
+                    lexSimilarity[cnt - 1] = lexSimilarity[i];
+                    asmSimilarity[cnt - 1] = asmSimilarity[i];
+                }
+                else --cnt;
+                toolStripProgressBar1.Value = (int)((i + 1) * 1000 / listBox2.Items.Count);
+                statusStrip1.Refresh();
+            }
+            toolStripStatusLabel1.Text = String.Format("相似度计算完毕，共{0}个代码，其中相似代码{1}个", listBox2.Items.Count, cnt);
+            listBox1.Items.Clear();
+            for (int i = 0; i < cnt; ++i)
+                listBox1.Items.Add(tx[i]);
+        }
+        #endregion
+
         private string dumpCode(string filename)
         {
             filename = StringFunctions.fileCToO(filename);
             Process objdump = new Process();
-            objdump.StartInfo.FileName = Consts.GCCROUTE + "objdump.exe";
+            objdump.StartInfo.FileName = System.Environment.CurrentDirectory + Consts.GCCADDROUTE + "objdump.exe";
             objdump.StartInfo.Arguments = "-d " + filename;
             objdump.StartInfo.WorkingDirectory = System.Environment.CurrentDirectory;
             objdump.StartInfo.RedirectStandardOutput = true;
@@ -324,7 +427,7 @@ namespace PlagiarismChecker
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 string foldPath = dialog.SelectedPath;
-                List<String> result = FileOpr.GetAllFolderFiles(foldPath, ".c");
+                List<String> result = FileOpr.GetAllFolderFiles(foldPath, new string[] { ".c", ".cpp", ".cc", ".cxx", ".c++" });
                 listBox2.Items.Clear();
                 int nowcount = 0;
                 toolStripProgressBar1.Value = 0;
@@ -346,24 +449,15 @@ namespace PlagiarismChecker
         {
             string temp = StringFunctions.foldToFileName(filename);
             if (File.Exists(temp)) return;
-            string code = StringFunctions.readFile(filename);
-            saveToFile(code, temp);
-            string asm = getASM(temp);
-            saveToFile(asm, StringFunctions.fileCToASM(temp));
-            CLexer nowC = new CLexer(code);
-            string initcode = nowC.getInitCode();
+            string code = FileOpr.readFile(filename);
+            FileOpr.saveToFile(code, temp);
+            string asm = Compiler.getASM(temp);
+            FileOpr.saveToFile(asm, StringFunctions.fileCToASM(temp));
+            Compiler.init(temp);
+            string initcode = FileOpr.readFile(StringFunctions.fileCToI(temp));
+            CLexer nowC = new CLexer(initcode);
             string lexcode = nowC.GetLexResult();
-            saveToFile(initcode, StringFunctions.fileCToI(temp));
-            saveToFile(lexcode, StringFunctions.fileCToLex(temp));
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button5_Click(object sender, EventArgs e)
-        {
-            rightText.Text = StringFunctions.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(leftFileName)));
+            FileOpr.saveToFile(lexcode, StringFunctions.fileCToLex(temp));
         }
         /// <summary>
         /// 优化编译
@@ -373,7 +467,7 @@ namespace PlagiarismChecker
         private void compile(string filename)
         {
             Process compiler = new Process();
-            compiler.StartInfo.FileName = Consts.GCCROUTE + "gcc.exe";
+            compiler.StartInfo.FileName = System.Environment.CurrentDirectory + Consts.GCCADDROUTE + "gcc.exe";
             compiler.StartInfo.Arguments = "-c -O3 " + filename + " -o " + StringFunctions.fileCToO(filename);
             compiler.StartInfo.WorkingDirectory = System.Environment.CurrentDirectory;
             compiler.StartInfo.UseShellExecute = false;
@@ -383,64 +477,9 @@ namespace PlagiarismChecker
             //MessageBox.Show("编译完成！");
             compiler.Close();
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Text"></param>
-        private void saveToFile(String Text)
-        {
-            FileStream fs = new FileStream("a.c", FileMode.Create);
-            StreamWriter sw = new StreamWriter(fs);
-            try
-            {
-                sw.Write(Text);
-                sw.Flush();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("保存失败，错误为" + ex.Message.ToString());
-            }
-            finally
-            {
-                sw.Close();
-                fs.Close();
-            }
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Text"></param>
-        /// <param name="filename"></param>
-        private void saveToFile(String Text, String filename)
-        {
-            FileStream fs = new FileStream(filename, FileMode.Create);
-            StreamWriter sw = new StreamWriter(fs);
-            try
-            {
-                sw.Write(Text);
-                sw.Flush();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("保存失败，错误为" + ex.Message.ToString());
-            }
-            finally
-            {
-                sw.Close();
-                fs.Close();
-            }
-        }
         
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button6_Click(object sender, EventArgs e)
-        {
-            rightText.Text = StringFunctions.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(leftFileName)));
-        }
+        
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             int index = listBox1.SelectedIndex;
@@ -453,8 +492,8 @@ namespace PlagiarismChecker
 
         private void button10_Click(object sender, EventArgs e)
         {
-            leftText.Text = StringFunctions.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(leftFileName)));
-            rightText.Text = StringFunctions.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
+            leftText.Text = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(leftFileName)));
+            rightText.Text = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
         }
         /// <summary>
         /// 比对原代码
@@ -463,20 +502,20 @@ namespace PlagiarismChecker
         /// <param name="e"></param>
         private void button8_Click(object sender, EventArgs e)
         {
-            leftText.Text = StringFunctions.readFile(StringFunctions.foldToFileName(leftFileName));
-            rightText.Text = StringFunctions.readFile(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString()));
+            leftText.Text = FileOpr.readFile(StringFunctions.foldToFileName(leftFileName));
+            rightText.Text = FileOpr.readFile(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString()));
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
-            leftText.Text = StringFunctions.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(leftFileName)));
-            rightText.Text = StringFunctions.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
+            leftText.Text = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(leftFileName)));
+            rightText.Text = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
         }
 
         private void button11_Click(object sender, EventArgs e)
         {
-            leftText.Text = StringFunctions.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(leftFileName)));
-            rightText.Text = StringFunctions.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
+            leftText.Text = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(leftFileName)));
+            rightText.Text = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
         }
 
         private void swap(ref double x, ref double y)
@@ -503,148 +542,18 @@ namespace PlagiarismChecker
             listBox1.Items[y] = temp;
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            int index = comboBox1.SelectedIndex;
-            if (index == 0) //按照原代码排序
-            {
-                for (int i = 0; i < listBox1.Items.Count; ++i)
-                    for (int j = i + 1; j < listBox1.Items.Count; ++j)
-                        if (codeSimilarity[i] < codeSimilarity[j]) myswap(i, j);
-            }
-            else if (index == 1) //按照预处理排序
-            {
-                for (int i = 0; i < listBox1.Items.Count; ++i)
-                    for (int j = i + 1; j < listBox1.Items.Count; ++j)
-                        if (initSimilarity[i] < initSimilarity[j]) myswap(i, j);
-            }
-            else if (index == 2) //按照词法树排序
-            {
-                for (int i = 0; i < listBox1.Items.Count; ++i)
-                    for (int j = i + 1; j < listBox1.Items.Count; ++j)
-                        if (lexSimilarity[i] < lexSimilarity[j]) myswap(i, j);
-            }
-            else
-            {
-                for (int i = 0; i < listBox1.Items.Count; ++i)
-                    for (int j = i + 1; j < listBox1.Items.Count; ++j)
-                        if (asmSimilarity[i] < asmSimilarity[j]) myswap(i, j);
-            }
-        }
 
         private void button4_Click_1(object sender, EventArgs e)
         {
             //build();            
             calAllSim();
         }
-
-        private void calAllSim()
-        {
-            string[] tx = new string[listBox2.Items.Count];
-            int cnt = 0;
-            if (leftText.Text == "")
-            {
-                MessageBox.Show("请从左侧选择一份待测代码！");
-                return;
-            }
-            if (listBox2.Items.Count == 0)
-            {
-                MessageBox.Show("请先选择一个非空文件夹！");
-                return;
-            }
-            string lcode = StringFunctions.readFile(StringFunctions.foldToFileName(leftFileName));
-            string linit = StringFunctions.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(leftFileName)));
-            string lasm = StringFunctions.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(leftFileName)));
-            string llex = StringFunctions.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(leftFileName)));
-            toolStripProgressBar1.Value = 0;
-            for (int i = 0; i < listBox2.Items.Count; ++i)
-            {
-                string code = StringFunctions.readFile(StringFunctions.foldToFileName(listBox2.Items[i] as string));
-                string initcode = StringFunctions.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
-                string lexcode = StringFunctions.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
-                string asm = StringFunctions.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
-                ++cnt;
-                toolStripStatusLabel1.Text = String.Format("正在计算{0}与第{1}个文件的相似度，共{2}个文件", leftFileName, i + 1, listBox2.Items.Count);
-                statusStrip1.Refresh();
-                codeSimilarity[i] = StringFunctions.calSim(lcode, code);
-                initSimilarity[i] = StringFunctions.calSim(linit, initcode);
-                lexSimilarity[i] = StringFunctions.calSim(llex, lexcode);
-                asmSimilarity[i] = StringFunctions.calSim(lasm, asm);
-                if (codeSimilarity[i] > 0.75 || initSimilarity[i] > 0.75 || lexSimilarity[i] > 0.75 || asmSimilarity[i] > 0.75)
-                //if (true)
-                {
-                    tx[cnt - 1] = listBox2.Items[i].ToString();
-                    codeSimilarity[cnt - 1] = codeSimilarity[i];
-                    initSimilarity[cnt - 1] = initSimilarity[i];
-                    lexSimilarity[cnt - 1] = lexSimilarity[i];
-                    asmSimilarity[cnt - 1] = asmSimilarity[i];
-                }
-                else --cnt;
-                toolStripProgressBar1.Value = (int)((i + 1) * 1000 / listBox2.Items.Count);
-                statusStrip1.Refresh();
-            }
-            toolStripStatusLabel1.Text = String.Format("相似度计算完毕，共{0}个代码，其中相似代码{1}个", listBox2.Items.Count, cnt);
-            listBox1.Items.Clear();
-            for (int i = 0; i < cnt; ++i)
-                listBox1.Items.Add(tx[i]);
-        }
-
-
-        private void calAllSim2()
-        {
-            string[] tx = new string[listBox2.Items.Count];
-            int cnt = 0;
-            if (leftText.Text == "")
-            {
-                MessageBox.Show("请从左侧选择一份待测代码！");
-                return;
-            }
-            if (listBox2.Items.Count == 0)
-            {
-                MessageBox.Show("请先选择一个非空文件夹！");
-                return;
-            }
-            string lcode = StringFunctions.readFile(StringFunctions.foldToFileName(leftFileName));
-            string linit = StringFunctions.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(leftFileName)));
-            string lasm = StringFunctions.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(leftFileName)));
-            string llex = StringFunctions.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(leftFileName)));
-            toolStripProgressBar1.Value = 0;
-            for (int i = 0; i < listBox2.Items.Count; ++i)
-            {
-                string code = StringFunctions.readFile(StringFunctions.foldToFileName(listBox2.Items[i] as string));
-                string initcode = StringFunctions.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
-                string lexcode = StringFunctions.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
-                string asm = StringFunctions.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(listBox2.Items[i] as string)));
-                ++cnt;
-                toolStripStatusLabel1.Text = String.Format("正在计算{0}与第{1}个文件的相似度，共{2}个文件", leftFileName, i + 1, listBox2.Items.Count);
-                statusStrip1.Refresh();
-                codeSimilarity[i] = StringFunctions.calSim(lcode, code);
-                initSimilarity[i] = StringFunctions.calSim(linit, initcode);
-                lexSimilarity[i] = StringFunctions.calSim(llex, lexcode);
-                asmSimilarity[i] = StringFunctions.calSim(lasm, asm);
-                //if (codeSimilarity[i] > 0.75 || initSimilarity[i] > 0.75 || lexSimilarity[i] > 0.8 || asmSimilarity[i] > 0.70)
-                if (true)
-                {
-                    tx[cnt - 1] = listBox2.Items[i].ToString();
-                    codeSimilarity[cnt - 1] = codeSimilarity[i];
-                    initSimilarity[cnt - 1] = initSimilarity[i];
-                    lexSimilarity[cnt - 1] = lexSimilarity[i];
-                    asmSimilarity[cnt - 1] = asmSimilarity[i];
-                }
-                else --cnt;
-                toolStripProgressBar1.Value = (int)((i + 1) * 1000 / listBox2.Items.Count);
-                statusStrip1.Refresh();
-            }
-            toolStripStatusLabel1.Text = String.Format("相似度计算完毕，共{0}个代码，其中相似代码{1}个", listBox2.Items.Count, cnt);
-            listBox1.Items.Clear();
-            for (int i = 0; i < cnt; ++i)
-                listBox1.Items.Add(tx[i]);
-        }
+        
 
         private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             leftFileName = listBox2.SelectedItem as string;
-            leftText.Text = StringFunctions.readFile(leftFileName);
+            leftText.Text = FileOpr.readFile(leftFileName);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -661,7 +570,7 @@ namespace PlagiarismChecker
         {
             List<string> files = new List<string>();
             for (int i = 0; i < listBox2.Items.Count; ++i) files.Add(listBox2.Items[i] as string);
-            Cluster data = new Cluster(files, this);
+            Cluster data = new Cluster(files, this, threshold);
             data.runCluster();
         }
 
@@ -678,7 +587,22 @@ namespace PlagiarismChecker
 
         private void button12_Click(object sender, EventArgs e)
         {
-            toolStripStatusLabel1.Text = string.Format("一共删除了{0}个文件", FileOpr.deleteAllExtentionFiles(System.Environment.CurrentDirectory, new string[] { ".c", ".o", ".i", ".a", ".l" }));
+            toolStripStatusLabel1.Text = string.Format("一共删除了{0}个文件", FileOpr.deleteAllExtentionFiles(System.Environment.CurrentDirectory, new string[] { ".c", ".o", ".i", ".a", ".l", ".x", ".cc", ".cpp", ".c++", "cxx" }));
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            threshold = Consts.SIMTHRESHOLD_LOW;
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            threshold = Consts.SIMTHRESHOLD_MID;
+        }
+
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            threshold = Consts.SIMTHRESHOLD_HIGH;
         }
 
     }

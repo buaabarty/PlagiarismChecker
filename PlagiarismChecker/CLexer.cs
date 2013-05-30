@@ -450,59 +450,7 @@ namespace PlagiarismChecker
         /// <param name="code">原始代码</param>
         public CLexer(String _code)
         {
-            FileStream fs = new FileStream("temp.c", FileMode.Create);
-            StreamWriter sw = new StreamWriter(fs);
-            try
-            {
-                sw.Write(_code);
-                sw.Flush();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("保存失败，错误为" + ex.Message.ToString());
-            }
-            finally
-            {
-                sw.Close();
-                fs.Close();
-            }
-            Process init = new Process();
-            init.StartInfo.FileName = Consts.GCCROUTE + "gcc.exe";
-            init.StartInfo.Arguments = "-E -o temp.x temp.c";
-            init.StartInfo.WorkingDirectory = System.Environment.CurrentDirectory;
-            init.StartInfo.UseShellExecute = false;
-            init.StartInfo.CreateNoWindow = true;
-            init.Start();
-            init.WaitForExit();
-            init.Close();
-            StreamReader sr = null;
-            try
-            {
-                sr = new StreamReader("temp.x", System.Text.Encoding.Default);
-                code = sr.ReadToEnd();
-                sr.Close();
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("由于编译错误，未能成功转换！");
-            }
-            String[] lines = code.Split('\n');
-            int lastsharp = 0, index = 0;
-            code = "";
-            foreach (string line in lines)
-            {
-                if (line.Length > 0 && line[0] == '#') lastsharp = index;
-                ++index;
-            }
-            index = 0;
-            foreach (string line in lines)
-            {
-                if (line.Trim().Length > 0 && index > lastsharp)
-                {
-                    code = code + line + '\n';
-                }
-                ++index;
-            }
+            code = _code;
         }
         /// <summary>
         /// 

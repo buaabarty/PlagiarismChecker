@@ -61,7 +61,7 @@ namespace PlagiarismChecker
             }
             return ans;
         }
-        public static List<String> GetAllFolderFiles(string folder, string extension)
+        public static List<String> GetAllFolderFiles(string folder, string[] extension)
         {
             DirectoryInfo myfolder = new DirectoryInfo(folder);
             FileSystemInfo[] files = myfolder.GetFileSystemInfos();
@@ -71,10 +71,12 @@ namespace PlagiarismChecker
                 FileInfo tfile = file as FileInfo;
                 if (tfile != null)
                 {
-                    if (tfile.Extension.ToLower() == extension.ToLower())
-                    {
-                        ans.Add(tfile.FullName);
-                    }
+                    for (int i = 0; i < extension.Length; ++i)
+                        if (tfile.Extension.ToLower() == extension[i].ToLower())
+                        {
+                            ans.Add(tfile.FullName);
+                            break;
+                        }
                 }
                 else
                 {
@@ -108,6 +110,65 @@ namespace PlagiarismChecker
                 }
             }
             return totDelete;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Text"></param>
+        public static void saveToFile(String Text)
+        {
+            FileStream fs = new FileStream("a.c", FileMode.Create);
+            StreamWriter sw = new StreamWriter(fs);
+            try
+            {
+                sw.Write(Text);
+                sw.Flush();
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("保存失败，错误为" + ex.Message.ToString());
+            }
+            finally
+            {
+                sw.Close();
+                fs.Close();
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <param name="filename"></param>
+        public static void saveToFile(String Text, String filename)
+        {
+            FileStream fs = new FileStream(filename, FileMode.Create);
+            StreamWriter sw = new StreamWriter(fs);
+            try
+            {
+                sw.Write(Text);
+                sw.Flush();
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("保存失败，错误为" + ex.Message.ToString());
+            }
+            finally
+            {
+                sw.Close();
+                fs.Close();
+            }
+        }
+        /// <summary>
+        /// 读文件，返回一个字符串
+        /// </summary>
+        /// <param name="filename">带路径的文件名</param>
+        /// <returns></returns>
+        public static string readFile(string filename)
+        {
+            StreamReader sr = new StreamReader(filename, System.Text.Encoding.Default);
+            string resuilt = sr.ReadToEnd();
+            sr.Close();
+            return resuilt;
         }
     }
     #endregion

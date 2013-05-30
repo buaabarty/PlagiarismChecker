@@ -42,10 +42,12 @@ namespace PlagiarismChecker
         public static int HASHSTEP = 5;
         public static int MAXFILES = 1024;
         public static string GCCROUTE = @"E:\Program Files (x86)\CodeBlocks\MinGW\bin\";
+        public static string GCCADDROUTE = @"\MinGW\bin\";
         public static int MAXNODE = 1 << 20;
         public static double SIMTHRESHOLD_MID = 0.75;
-        public static double SIMTHRESHOLD_HIGH = 0.9;
-        public static double SIMTHRESHOLD_LOW = 0.6;
+        public static double SIMTHRESHOLD_HIGH = 0.95;
+        public static double SIMTHRESHOLD_LOW = 0.5;
+        public static int MAXSIMGROUPSIZE = 10;
     }
     #endregion
 }
