@@ -1,4 +1,4 @@
 PlagiarismChecker
 =================
 
-C Code Plagiarism Checker
+C/C++ Code Plagiarism Checker
