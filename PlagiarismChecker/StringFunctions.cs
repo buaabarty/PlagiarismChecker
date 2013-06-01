@@ -185,7 +185,7 @@ namespace PlagiarismChecker
                     ++locy;
                 }
             }
-            double ans = (double)(totsame * 2) / (double)(lenx + leny);
+            double ans = (double)(totsame) / (double)Math.Min(lenx, leny);
             return ans;
         }
         /// <summary>

@@ -493,7 +493,7 @@ namespace PlagiarismChecker
         private void button10_Click(object sender, EventArgs e)
         {
             leftText.Text = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(leftFileName)));
-            rightText.Text = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
+            if (listBox1.SelectedItem != null) rightText.Text = FileOpr.readFile(StringFunctions.fileCToASM(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
         }
         /// <summary>
         /// 比对原代码
@@ -503,19 +503,19 @@ namespace PlagiarismChecker
         private void button8_Click(object sender, EventArgs e)
         {
             leftText.Text = FileOpr.readFile(StringFunctions.foldToFileName(leftFileName));
-            rightText.Text = FileOpr.readFile(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString()));
+            if (listBox1.SelectedItem != null) rightText.Text = FileOpr.readFile(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString()));
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
             leftText.Text = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(leftFileName)));
-            rightText.Text = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
+            if (listBox1.SelectedItem != null) rightText.Text = FileOpr.readFile(StringFunctions.fileCToI(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
         }
 
         private void button11_Click(object sender, EventArgs e)
         {
             leftText.Text = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(leftFileName)));
-            rightText.Text = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
+            if (listBox1.SelectedItem != null) rightText.Text = FileOpr.readFile(StringFunctions.fileCToLex(StringFunctions.foldToFileName(listBox1.SelectedItem.ToString())));
         }
 
         private void swap(ref double x, ref double y)
