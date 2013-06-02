@@ -47,6 +47,7 @@ namespace PlagiarismChecker
         public static double SIMTHRESHOLD_MID = 0.75;
         public static double SIMTHRESHOLD_HIGH = 0.95;
         public static double SIMTHRESHOLD_LOW = 0.6;
+        public static double SIMTHRESHOLD_MUST = 0.1;
         public static int MAXSIMGROUPSIZE = 10;
     }
     #endregion

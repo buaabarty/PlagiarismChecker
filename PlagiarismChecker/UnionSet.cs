@@ -24,6 +24,18 @@ namespace PlagiarismChecker
         public UnionSet()
         {
         }
+
+        public Cluster Cluster
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+            set
+            {
+            }
+        }
+    
         public int getAncestor(int v)
         {
             if (fa[v] != v) fa[v] = getAncestor(fa[v]);

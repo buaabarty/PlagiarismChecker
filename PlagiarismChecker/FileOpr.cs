@@ -12,6 +12,16 @@ namespace PlagiarismChecker
     /// </summary>
     public class FileOpr
     {
+        internal CLexer CLexer
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+            set
+            {
+            }
+        }
         /// <summary>
         /// 自定义文件遍历方法，根据筛选器进行筛选，并生成自定义数据类型列表
         /// </summary>
@@ -69,6 +79,35 @@ namespace PlagiarismChecker
             foreach (FileSystemInfo file in files)
             {
                 FileInfo tfile = file as FileInfo;
+                if (tfile != null)
+                {
+                    for (int i = 0; i < extension.Length; ++i)
+                        if (tfile.Extension.ToLower() == extension[i].ToLower())
+                        {
+                            ans.Add(tfile.FullName);
+                            break;
+                        }
+                }
+                else
+                {
+                    List<String> temp = GetAllFolderFiles(file.FullName, extension);
+                    foreach (String str in temp)
+                    {
+                        ans.Add(str);
+                    }
+                }
+            }
+            return ans;
+        }
+        public static List<String> GetAllFolderFiles(string folder, string[] extension, string contains)
+        {
+            DirectoryInfo myfolder = new DirectoryInfo(folder);
+            FileSystemInfo[] files = myfolder.GetFileSystemInfos();
+            List<String> ans = new List<String>();
+            foreach (FileSystemInfo file in files)
+            {
+                FileInfo tfile = file as FileInfo;
+                if (!tfile.FullName.Contains(contains)) continue;
                 if (tfile != null)
                 {
                     for (int i = 0; i < extension.Length; ++i)

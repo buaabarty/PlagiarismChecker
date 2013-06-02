@@ -9,6 +9,17 @@ namespace PlagiarismChecker
 {
     public static class Compiler
     {
+        internal static CLexer CLexer
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+            set
+            {
+            }
+        }
+    
         public static string dumpCode(string filename)
         {
             filename = StringFunctions.fileCToO(filename);

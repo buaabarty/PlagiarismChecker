@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PlagiarismChecker.CLexer" Collapsed="true">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kQAAGAAAEAgAICAAACAAiAABIEAAYgEAQYBAIABAYIA=</HashCode>
+      <FileName>CLexer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlagiarismChecker.Cluster" Collapsed="true">
+    <Position X="3.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAEAAAAAIAAAAAASAAAACAAAAAAgAAAACA=</HashCode>
+      <FileName>Cluster.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ClusterResult" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PlagiarismChecker.ClusterResult" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAACAAAAAABBCAAAACAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>ClusterResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlagiarismChecker.Compiler" Collapsed="true">
+    <Position X="4.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAQAAAAAAAAAAAAAAAAEAAAAAAAAJAAAAAAAAAAAA=</HashCode>
+      <FileName>Compiler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="CLexer" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PlagiarismChecker.FileOpr" Collapsed="true">
+    <Position X="6.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAEAAAEBgQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>FileOpr.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="CLexer" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PlagiarismChecker.Form1" Collapsed="true">
+    <Position X="6.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>KCBgQA0BESQAAFAhDLCAAkQCAE46QHpgwVIRCEBkwBM=</HashCode>
+      <FileName>Form1.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="FileOpr" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PlagiarismChecker.SimilarityData" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAEAAAABAAgAAQAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>SimilarityData.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ClusterResult" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PlagiarismChecker.StringFunctions" Collapsed="true">
+    <Position X="3.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABgAIAAAACBACAAAASgAAAAAAAAAAISgIEBAIAAAEQ=</HashCode>
+      <FileName>StringFunctions.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Form1" />
+      <Property Name="UnionSet" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PlagiarismChecker.UnionSet" Collapsed="true">
+    <Position X="2.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgGAAAgEAAAIAAAABIAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UnionSet.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Cluster" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="微软雅黑" Size="9" />
+</ClassDiagram>

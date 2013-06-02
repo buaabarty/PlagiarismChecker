@@ -12,6 +12,27 @@ namespace PlagiarismChecker
     /// </summary>
     public static class StringFunctions
     {
+        public static Form1 Form1
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+            set
+            {
+            }
+        }
+
+        public static UnionSet UnionSet
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+            set
+            {
+            }
+        }
         
         /// <summary>
         /// 将形如[][][]的文件名切割成字符串数组
@@ -200,6 +221,44 @@ namespace PlagiarismChecker
             ans = ans.Replace(':', '_');
             return ans;
         }
+        public static string changeToFunction(string instrument)
+        {
+            bool inside = false;
+            string ret = "";
+            for (int i = 0; i < instrument.Length; ++i)
+            {
+                if (instrument[i] == '<')
+                {
+                    inside = true;
+                    ret += instrument[i];
+                }
+                else if (instrument[i] == '>')
+                {
+                    inside = false;
+                    ret += "func" + instrument[i];
+                }
+                else if (!inside)
+                {
+                    ret += instrument[i];
+                }
+            }
+            return ret;
+        }
+        public static string changeToVar(string instrument)
+        {
+            int loc;
+            while ((loc = instrument.IndexOf('%')) >= 0)
+            {
+                string text = "%";
+                ++loc;
+                while (loc < instrument.Length && Char.IsLetter(instrument[loc]))
+                {
+                    text = text + instrument[loc++];
+                }
+                instrument = instrument.Replace(text, "var");
+            }
+            return instrument;
+        }
         /// <summary>
         /// 汇编代码优化
         /// </summary>
@@ -211,20 +270,33 @@ namespace PlagiarismChecker
             asm = asm.Replace("\t", "   ");
             string[] lines = asm.Split('\n');
             string result = "";
+            string lasttext = "";
             for (int i = 0; i < lines.Length; ++i)
                 if (lines[i].Trim().Length > 0)
                 {
-                    if (Char.IsDigit(lines[i][0])) result = result + "function" + "\r\n";
+                    if (Char.IsDigit(lines[i][0])) result = result + "startfunc" + "\r\n";
                     else if (lines[i][0] == ' ' && lines[i].Length > 32)
                     {
                         string text = lines[i].Substring(32, lines[i].Length - 32).Trim();
+                        if (text.IndexOf('<') >= 0) text = changeToFunction(text);
+                        if (text.IndexOf('%') >= 0) text = changeToVar(text);
                         if (text.Length > 3 && text.Substring(0, 3) == "jmp") text = "jmp    offset";
-                        else if (text.Length > 4 && text.Substring(0, 4) == "call") text = "call   function";
+                        else if (text.Length > 4 && text.Substring(0, 4) == "call") text = "call   func";
                         else if (text.Length > 2 && text.Substring(0, 2) == "jl") text = text.Replace("jl", "jg");
                         else if (text.Length > 2 && text.Substring(0, 2) == "jle") text = text.Replace("jle", "jge");
-                        else if (text.Length > 4 && text.Substring(0, 4) == "push") text = "push   constant";
+                        else if (text.Length > 4 && text.Substring(0, 4) == "push")
+                        {
+                            if (lasttext.Length > 4 && lasttext.Substring(0, 4) == "push") continue;
+                            text = "push   const";
+                        }
+                        else if (text.Length > 3 && text.Substring(0, 3) == "pop")
+                        {
+                            if (lasttext.Length > 3 && lasttext.Substring(0, 3) == "pop") continue;
+                            text = "pop    const";
+                        }
                         else if (text.Length >= 5 && text.Substring(0, 5) == "leave") continue;
                         else if (text.Length >= 3 && (text.Substring(0, 3) == "nop" || text.Substring(0, 3) == "ret")) continue;
+                        lasttext = text;
                         result = result + text + "\r\n";
                     }
                 }

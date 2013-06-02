@@ -46,6 +46,17 @@ namespace PlagiarismChecker
             toolStripStatusLabel1.Text = "请选择目录~";
             threshold = Consts.SIMTHRESHOLD_MID;
         }
+
+        public FileOpr FileOpr
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+            set
+            {
+            }
+        }
         #region UI_Compoment
         /// <summary>
         /// 
@@ -283,6 +294,8 @@ namespace PlagiarismChecker
         /// </summary>
         private void calAllSim()
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             string[] tx = new string[listBox2.Items.Count];
             int cnt = 0;
             if (leftText.Text == "")
@@ -313,7 +326,9 @@ namespace PlagiarismChecker
                 initSimilarity[i] = StringFunctions.calSim(linit, initcode);
                 lexSimilarity[i] = StringFunctions.calSim(llex, lexcode);
                 asmSimilarity[i] = StringFunctions.calSim(lasm, asm);
-                if (codeSimilarity[i] > threshold || initSimilarity[i] > threshold || lexSimilarity[i] > threshold || asmSimilarity[i] > threshold)
+                if ((codeSimilarity[i] > threshold || initSimilarity[i] > threshold || lexSimilarity[i] > threshold || asmSimilarity[i] > threshold)
+                  && codeSimilarity[i] > Consts.SIMTHRESHOLD_MUST && initSimilarity[i] > Consts.SIMTHRESHOLD_MUST
+                  && lexSimilarity[i] > Consts.SIMTHRESHOLD_MUST && asmSimilarity[i] > Consts.SIMTHRESHOLD_MUST)
                 //if (true)
                 {
                     tx[cnt - 1] = listBox2.Items[i].ToString();
@@ -326,7 +341,8 @@ namespace PlagiarismChecker
                 toolStripProgressBar1.Value = (int)((i + 1) * 1000 / listBox2.Items.Count);
                 statusStrip1.Refresh();
             }
-            toolStripStatusLabel1.Text = String.Format("相似度计算完毕，共{0}个代码，其中相似代码{1}个", listBox2.Items.Count, cnt);
+            stopWatch.Stop();
+            toolStripStatusLabel1.Text = String.Format("相似度计算完毕，共{0}个代码，其中相似代码{1}个，运行{2}毫秒", listBox2.Items.Count, cnt, stopWatch.ElapsedMilliseconds);
             listBox1.Items.Clear();
             for (int i = 0; i < cnt; ++i)
                 listBox1.Items.Add(tx[i]);
@@ -426,8 +442,10 @@ namespace PlagiarismChecker
             dialog.Description = "选择查找相似代码范围";
             if (dialog.ShowDialog() == DialogResult.OK)
             {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
                 string foldPath = dialog.SelectedPath;
-                List<String> result = FileOpr.GetAllFolderFiles(foldPath, new string[] { ".c", ".cpp", ".cc", ".cxx", ".c++" });
+                List<String> result = FileOpr.GetAllFolderFiles(foldPath, new string[] { ".c", ".cpp", ".cc", ".cxx", ".c++" }, "BCPC");
                 listBox2.Items.Clear();
                 int nowcount = 0;
                 toolStripProgressBar1.Value = 0;
@@ -440,7 +458,8 @@ namespace PlagiarismChecker
                     statusStrip1.Refresh();
                     listBox2.Refresh();
                 }
-                toolStripStatusLabel1.Text = String.Format("处理完毕，共{0}个文件", result.Count);
+                stopWatch.Stop();
+                toolStripStatusLabel1.Text = String.Format("处理完毕，共{0}个文件，执行{1}毫秒", result.Count, stopWatch.ElapsedMilliseconds);
                 statusStrip1.Refresh();
             }
         }
@@ -587,7 +606,11 @@ namespace PlagiarismChecker
 
         private void button12_Click(object sender, EventArgs e)
         {
-            toolStripStatusLabel1.Text = string.Format("一共删除了{0}个文件", FileOpr.deleteAllExtentionFiles(System.Environment.CurrentDirectory, new string[] { ".c", ".o", ".i", ".a", ".l", ".x", ".cc", ".cpp", ".c++", "cxx" }));
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            int ret = FileOpr.deleteAllExtentionFiles(System.Environment.CurrentDirectory, new string[] { ".c", ".o", ".i", ".a", ".l", ".x", ".cc", ".cpp", ".c++", "cxx" });
+            stopWatch.Stop();
+            toolStripStatusLabel1.Text = string.Format("一共删除了{0}个文件，耗时{1}毫秒", ret, stopWatch.ElapsedMilliseconds);
         }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)

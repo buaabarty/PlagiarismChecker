@@ -50,6 +50,18 @@ namespace PlagiarismChecker
         public Cluster()
         {
         }
+
+        public ClusterResult ClusterResult
+        {
+            get
+            {
+                throw new System.NotImplementedException();
+            }
+            set
+            {
+            }
+        }
+    
         private List<SimilarityData> calTheFile(string fa)
         {
             List<SimilarityData> ans = new List<SimilarityData>();
@@ -94,6 +106,8 @@ namespace PlagiarismChecker
         public void runCluster()
         {
             baseForm.setStatusText("聚类中");
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
             graph = new UnionSet(size);
             for (int i = 0; i < size; ++i)
             {
@@ -117,7 +131,8 @@ namespace PlagiarismChecker
             baseForm.setProgressBar(1000);
             ClusterResult newForm = new ClusterResult(clusterResult);
             newForm.Show();
-            baseForm.setStatusText("聚类完毕");
+            stopWatch.Stop();
+            baseForm.setStatusText(String.Format("聚类完毕，共{0}个文件，获得{1}个抄袭组，共耗时{2}毫秒", size, tot, stopWatch.ElapsedMilliseconds));
         }
     }
 
