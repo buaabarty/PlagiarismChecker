@@ -83,6 +83,7 @@
             this.leftText.Location = new System.Drawing.Point(281, 285);
             this.leftText.Name = "leftText";
             this.leftText.Paddings = new System.Windows.Forms.Padding(0);
+            this.leftText.ReadOnly = true;
             this.leftText.ReservedCountOfLineNumberChars = 2;
             this.leftText.RightBracket = ')';
             this.leftText.RightBracket2 = '}';
